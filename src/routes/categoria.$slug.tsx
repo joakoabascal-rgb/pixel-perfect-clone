@@ -1,15 +1,18 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { catalogQuery, categoryPath, plantsIn } from "@/lib/catalog";
+import { zodValidator } from "@tanstack/zod-adapter";
+import { catalogQuery, categoryPath, itemsIn } from "@/lib/catalog";
+import { browseSearch } from "@/lib/search";
 import { Breadcrumb, Browser, Loading, Shell } from "@/components/catalog-ui";
 
 export const Route = createFileRoute("/categoria/$slug")({
+  validateSearch: zodValidator(browseSearch),
   head: () => ({
     meta: [
       { title: "Categoría — Herbario" },
-      { name: "description", content: "Explora las especies de esta carpeta del herbario." },
+      { name: "description", content: "Explora las entradas de esta carpeta del catálogo." },
       { property: "og:title", content: "Categoría — Herbario" },
-      { property: "og:description", content: "Explora las especies de esta carpeta del herbario." },
+      { property: "og:description", content: "Explora las entradas de esta carpeta del catálogo." },
     ],
   }),
   component: CategoryPage,
@@ -17,6 +20,8 @@ export const Route = createFileRoute("/categoria/$slug")({
 
 function CategoryPage() {
   const { slug } = Route.useParams();
+  const { q, tags } = Route.useSearch();
+  const navigate = Route.useNavigate();
   const { data } = useQuery(catalogQuery);
   if (!data) return <Shell><Loading /></Shell>;
   const cat = data.categories.find((c) => c.slug === slug);
@@ -31,20 +36,21 @@ function CategoryPage() {
     );
   }
   const children = data.categories.filter((c) => c.parent_id === cat.id);
-  const siblings = data.categories.filter((c) => c.parent_id === cat.parent_id);
-  const showChildren = children.length > 0;
-  const folders = (showChildren ? children : siblings).map((c) => ({ cat: c, count: plantsIn(c.id, data).length }));
   return (
     <Shell>
       <Breadcrumb path={categoryPath(cat, data.categories)} />
       <Browser
         key={cat.id}
         title={cat.name}
-        folderLabel={showChildren ? "Subcategorías" : "En esta carpeta"}
-        folders={folders}
-        activeFolderId={showChildren ? undefined : cat.id}
-        plants={plantsIn(cat.id, data)}
+        description={cat.description}
+        folderLabel="Subcategorías"
+        folders={children.map((c) => ({ cat: c, count: itemsIn(c.id, data).length }))}
+        items={itemsIn(cat.id, data)}
         catalog={data}
+        q={q}
+        tags={tags}
+        from={cat.slug}
+        onSearch={(next) => navigate({ search: (prev) => ({ ...prev, ...next }), replace: true })}
       />
     </Shell>
   );
