@@ -49,6 +49,166 @@ export type Database = {
           },
         ]
       }
+      item_categories: {
+        Row: {
+          category_id: string
+          item_id: string
+        }
+        Insert: {
+          category_id: string
+          item_id: string
+        }
+        Update: {
+          category_id?: string
+          item_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "item_categories_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "item_categories_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      item_images: {
+        Row: {
+          caption: string | null
+          id: string
+          image_key: string
+          item_id: string
+          position: number
+        }
+        Insert: {
+          caption?: string | null
+          id?: string
+          image_key: string
+          item_id: string
+          position?: number
+        }
+        Update: {
+          caption?: string | null
+          id?: string
+          image_key?: string
+          item_id?: string
+          position?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "item_images_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      item_tags: {
+        Row: {
+          item_id: string
+          tag_id: string
+        }
+        Insert: {
+          item_id: string
+          tag_id: string
+        }
+        Update: {
+          item_id?: string
+          tag_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "item_tags_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "item_tags_tag_id_fkey"
+            columns: ["tag_id"]
+            isOneToOne: false
+            referencedRelation: "tags"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      item_types: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          slug: string
+          subtitle_label: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          slug: string
+          subtitle_label?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          slug?: string
+          subtitle_label?: string | null
+        }
+        Relationships: []
+      }
+      items: {
+        Row: {
+          attributes: Json
+          created_at: string
+          description: string | null
+          id: string
+          image_key: string | null
+          name: string
+          slug: string
+          subtitle: string | null
+          type_id: string
+        }
+        Insert: {
+          attributes?: Json
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_key?: string | null
+          name: string
+          slug: string
+          subtitle?: string | null
+          type_id: string
+        }
+        Update: {
+          attributes?: Json
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_key?: string | null
+          name?: string
+          slug?: string
+          subtitle?: string | null
+          type_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "items_type_id_fkey"
+            columns: ["type_id"]
+            isOneToOne: false
+            referencedRelation: "item_types"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       plant_categories: {
         Row: {
           category_id: string
