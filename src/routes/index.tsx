@@ -1,24 +1,36 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { catalogQuery, plantsIn } from "@/lib/catalog";
+import { Breadcrumb, Browser, Loading, Shell } from "@/components/catalog-ui";
 
-// No head() here: the home route inherits title/description/og/twitter from
-// __root.tsx, and ships no og:image so serve-time hosting can inject the
-// project's social preview (explicit og:image or latest screenshot).
 export const Route = createFileRoute("/")({
+  head: () => ({
+    meta: [
+      { title: "Herbario — Catálogo de plantas" },
+      { name: "description", content: "Enciclopedia curada de plantas: navega por categorías, busca y filtra por etiquetas." },
+      { property: "og:title", content: "Herbario — Catálogo de plantas" },
+      { property: "og:description", content: "Enciclopedia curada de plantas: navega por categorías, busca y filtra por etiquetas." },
+    ],
+  }),
   component: Index,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
 function Index() {
+  const { data } = useQuery(catalogQuery);
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
-    </div>
+    <Shell>
+      <Breadcrumb path={[]} />
+      {!data ? (
+        <Loading />
+      ) : (
+        <Browser
+          title="Todas las plantas"
+          folderLabel="Categorías"
+          folders={data.categories.filter((c) => !c.parent_id).map((cat) => ({ cat, count: plantsIn(cat.id, data).length }))}
+          plants={data.plants}
+          catalog={data}
+        />
+      )}
+    </Shell>
   );
 }
