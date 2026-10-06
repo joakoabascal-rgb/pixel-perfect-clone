@@ -77,7 +77,7 @@ export function PlantCard({ plant, tags }: { plant: Plant; tags: Tag[] }) {
 type Folder = { cat: Category; count: number };
 
 export function Browser({ title, folders, folderLabel, plants, catalog, activeFolderId }: {
-  title: string; folders: Folder[]; folderLabel: string; plants: Plant[]; catalog: Catalog; activeFolderId?: string;
+  title: string; folders: Folder[]; folderLabel: string; plants: Plant[]; catalog: Catalog; activeFolderId?: string | undefined;
 }) {
   const [q, setQ] = useState("");
   const [sel, setSel] = useState<string[]>([]);
