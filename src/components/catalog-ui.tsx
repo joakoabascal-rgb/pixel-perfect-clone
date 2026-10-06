@@ -1,12 +1,12 @@
-import { Link } from "@tanstack/react-router";
-import { useState, type ReactNode } from "react";
-import { plantImage, filterPlants, type Catalog, type Category, type Plant, type Tag } from "@/lib/catalog";
+import { Link, useRouter } from "@tanstack/react-router";
+import type { ReactNode } from "react";
+import { imageSrc, filterItems, type Catalog, type Category, type Item, type Tag } from "@/lib/catalog";
 
 export function Shell({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen text-foreground">
       <header className="sticky top-0 z-30 border-b border-border bg-secondary/60 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-6xl items-center gap-6 px-6 py-4">
+        <div className="mx-auto flex max-w-6xl items-center gap-6 px-4 py-3 sm:px-6 sm:py-4">
           <Link to="/" className="flex items-center gap-2.5">
             <span className="grid size-8 place-items-center rounded-full bg-primary/15 ring-1 ring-primary/20">
               <span className="size-2.5 rounded-full bg-primary" />
@@ -20,136 +20,188 @@ export function Shell({ children }: { children: ReactNode }) {
           </nav>
         </div>
       </header>
-      <main className="mx-auto max-w-6xl px-6">{children}</main>
-      <footer className="mx-auto max-w-6xl px-6 py-10 text-sm text-muted-foreground">
-        <p className="max-w-[56ch] text-pretty">Herbario — catálogo curado de especies con navegación por carpetas, etiquetas y fichas de perfil.</p>
+      <main className="mx-auto max-w-6xl px-4 sm:px-6">{children}</main>
+      <footer className="mx-auto max-w-6xl px-4 py-10 text-sm text-muted-foreground sm:px-6">
+        <p className="max-w-[56ch] text-pretty">Herbario — catálogo universal con navegación por carpetas, etiquetas y fichas.</p>
       </footer>
     </div>
   );
 }
 
-export function Breadcrumb({ path }: { path: Category[] }) {
+export function BackButton() {
+  const router = useRouter();
   return (
-    <section className="flex flex-wrap items-center gap-x-1.5 gap-y-1 py-5 text-[13px] text-muted-foreground">
-      <Link to="/" className="transition-colors hover:text-primary">Plantas</Link>
-      {path.map((c, i) => (
-        <span key={c.id} className="flex items-center gap-1.5">
-          <span className="opacity-50">/</span>
-          {i === path.length - 1 ? (
-            <span className="font-medium text-foreground">{c.name}</span>
-          ) : (
-            <Link to="/categoria/$slug" params={{ slug: c.slug }} className="transition-colors hover:text-primary">{c.name}</Link>
-          )}
-        </span>
-      ))}
+    <button
+      onClick={() => router.history.back()}
+      className="glass inline-flex min-h-10 items-center gap-1.5 rounded-full px-4 text-sm text-muted-foreground transition-colors hover:text-foreground"
+    >
+      ← Volver
+    </button>
+  );
+}
+
+export function Breadcrumb({ path, current, back = true }: { path: Category[]; current?: string; back?: boolean }) {
+  return (
+    <section className="flex flex-wrap items-center gap-3 py-5">
+      {back && (path.length > 0 || current) && <BackButton />}
+      <div className="flex flex-wrap items-center gap-x-1.5 gap-y-1 text-[13px] text-muted-foreground">
+        <Link to="/" className="transition-colors hover:text-primary">Inicio</Link>
+        {path.map((c, i) => (
+          <span key={c.id} className="flex items-center gap-1.5">
+            <span className="opacity-50">/</span>
+            {i === path.length - 1 && !current ? (
+              <span className="font-medium text-foreground">{c.name}</span>
+            ) : (
+              <Link to="/categoria/$slug" params={{ slug: c.slug }} className="transition-colors hover:text-primary">{c.name}</Link>
+            )}
+          </span>
+        ))}
+        {current && (
+          <span className="flex items-center gap-1.5">
+            <span className="opacity-50">/</span>
+            <span className="font-medium text-foreground">{current}</span>
+          </span>
+        )}
+      </div>
     </section>
   );
 }
 
 export function TagChip({ tag, primary }: { tag: Tag; primary?: boolean }) {
-  return primary ? (
-    <span className="rounded-full bg-primary/12 px-2.5 py-1 text-[11px] font-medium text-primary">{tag.name}</span>
-  ) : (
-    <span className="rounded-full bg-background px-2.5 py-1 text-[11px] text-muted-foreground ring-1 ring-border">{tag.name}</span>
+  return (
+    <Link
+      to="/"
+      search={{ tags: [tag.slug] }}
+      className={
+        primary
+          ? "rounded-full bg-primary/12 px-2.5 py-1 text-[11px] font-medium text-primary hover:bg-primary/20"
+          : "rounded-full bg-background px-2.5 py-1 text-[11px] text-muted-foreground ring-1 ring-border hover:text-foreground"
+      }
+    >
+      #{tag.name.toLowerCase()}
+    </Link>
   );
 }
 
-export function PlantCard({ plant, tags }: { plant: Plant; tags: Tag[] }) {
-  const ptags = plant.tagIds.map((id) => tags.find((t) => t.id === id)).filter(Boolean) as Tag[];
+export function ItemCard({ item, catalog, from }: { item: Item; catalog: Catalog; from?: string | undefined }) {
+  const type = catalog.types.find((t) => t.id === item.type_id);
+  const src = imageSrc(item.image_key);
   return (
-    <Link to="/planta/$slug" params={{ slug: plant.slug }} className="glass block overflow-hidden rounded-2xl transition-transform hover:-translate-y-0.5">
-      <div className="aspect-[4/3] bg-muted">
-        {plantImage(plant.image_key) && (
-          <img src={plantImage(plant.image_key)} alt={plant.name} loading="lazy" width={896} height={752} className="size-full object-cover" />
+    <Link
+      to="/item/$slug"
+      params={{ slug: item.slug }}
+      search={from ? { desde: from } : {}}
+      className="glass block overflow-hidden rounded-2xl transition-transform hover:-translate-y-0.5"
+    >
+      <div className="relative aspect-[4/3] bg-muted">
+        {src ? (
+          <img src={src} alt={item.name} loading="lazy" width={896} height={752} className="size-full object-cover" />
+        ) : (
+          <div className="grid size-full place-items-center font-display text-4xl text-sage">{item.name[0]}</div>
+        )}
+        {type && (
+          <span className="absolute left-3 top-3 rounded-full bg-background/80 px-2.5 py-1 text-[11px] font-medium text-foreground backdrop-blur">
+            {type.name}
+          </span>
         )}
       </div>
       <div className="p-4">
-        <h2 className="font-display text-lg font-medium text-balance">{plant.name}</h2>
-        <p className="mt-1 text-sm italic text-muted-foreground">{plant.scientific_name}</p>
-        <div className="mt-3 flex flex-wrap gap-1.5">
-          {ptags.slice(0, 3).map((t, i) => <TagChip key={t.id} tag={t} primary={i === 0} />)}
-        </div>
+        <h2 className="font-display text-lg font-medium text-balance">{item.name}</h2>
+        {item.subtitle && <p className="mt-1 text-sm italic text-muted-foreground">{item.subtitle}</p>}
       </div>
+    </Link>
+  );
+}
+
+function CategoryCard({ cat, count }: { cat: Category; count: number }) {
+  return (
+    <Link
+      to="/categoria/$slug"
+      params={{ slug: cat.slug }}
+      className="glass flex min-h-20 flex-col justify-between rounded-2xl p-4 transition-transform hover:-translate-y-0.5"
+    >
+      <span className="flex items-start justify-between gap-2">
+        <span className="grid size-8 place-items-center rounded-lg bg-primary/12 text-primary">▢</span>
+        <span className="text-xs text-muted-foreground">{count}</span>
+      </span>
+      <span className="mt-3 font-display text-base font-medium">{cat.name}</span>
     </Link>
   );
 }
 
 type Folder = { cat: Category; count: number };
 
-export function Browser({ title, folders, folderLabel, plants, catalog, activeFolderId }: {
-  title: string; folders: Folder[]; folderLabel: string; plants: Plant[]; catalog: Catalog; activeFolderId?: string | undefined;
+export function Browser({ title, description, folders, folderLabel, items, catalog, q, tags, onSearch, from }: {
+  title: string; description?: string | null | undefined; folders: Folder[]; folderLabel: string; items: Item[]; catalog: Catalog;
+  q: string; tags: string[]; onSearch: (next: { q?: string; tags?: string[] }) => void; from?: string | undefined;
 }) {
-  const [q, setQ] = useState("");
-  const [sel, setSel] = useState<string[]>([]);
-  const usedTagIds = new Set(plants.flatMap((p) => p.tagIds));
-  const tags = catalog.tags.filter((t) => usedTagIds.has(t.id));
-  const shown = filterPlants(plants, q, sel, catalog.tags);
-  const toggle = (id: string) => setSel((s) => (s.includes(id) ? s.filter((x) => x !== id) : [...s, id]));
+  const usedTagIds = new Set(items.flatMap((p) => p.tagIds));
+  const availTags = catalog.tags.filter((t) => usedTagIds.has(t.id) || tags.includes(t.slug));
+  const shown = filterItems(items, q, tags, catalog);
+  const toggle = (slug: string) => onSearch({ tags: tags.includes(slug) ? tags.filter((x) => x !== slug) : [...tags, slug] });
 
   return (
-    <div className="grid grid-cols-1 gap-8 lg:grid-cols-[240px_1fr]">
-      <aside className="space-y-7 lg:sticky lg:top-24 lg:self-start">
-        <div className="glass rounded-2xl p-2 pl-4">
-          <input
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-            placeholder="Buscar especies…"
-            className="w-full bg-transparent py-2 text-sm outline-none placeholder:text-muted-foreground"
-          />
-        </div>
-        {folders.length > 0 && (
-          <div className="glass rounded-2xl p-5">
-            <p className="eyebrow mb-3">{folderLabel}</p>
-            <ul className="space-y-0.5 text-sm">
-              {folders.map(({ cat, count }) => (
-                <li key={cat.id}>
-                  <Link
-                    to="/categoria/$slug"
-                    params={{ slug: cat.slug }}
-                    className={
-                      cat.id === activeFolderId
-                        ? "flex items-center justify-between rounded-lg bg-primary/15 px-2.5 py-2 font-medium text-primary ring-1 ring-primary/20"
-                        : "flex items-center justify-between rounded-lg px-2.5 py-2 text-muted-foreground transition-colors hover:bg-primary/10 hover:text-foreground"
-                    }
-                  >
-                    {cat.name} <span className="text-xs opacity-70">{count}</span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
+    <div className="space-y-6 pb-6">
+      <div>
+        <h1 className="font-display text-3xl font-medium leading-tight text-balance">{title}</h1>
+        {description && <p className="mt-1 text-sm text-muted-foreground">{description}</p>}
+      </div>
+
+      <div className="glass flex items-center gap-2 rounded-2xl px-4">
+        <span className="text-muted-foreground">⌕</span>
+        <input
+          value={q}
+          onChange={(e) => onSearch({ q: e.target.value })}
+          placeholder="Buscar por nombre, etiqueta o categoría…"
+          className="min-h-12 w-full bg-transparent text-base outline-none placeholder:text-muted-foreground sm:text-sm"
+        />
+      </div>
+
+      {folders.length > 0 && (
+        <section>
+          <p className="eyebrow mb-3">{folderLabel}</p>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+            {folders.map((f) => <CategoryCard key={f.cat.id} {...f} />)}
           </div>
-        )}
-        {tags.length > 0 && (
-          <div className="glass rounded-2xl p-5">
-            <p className="eyebrow mb-3">Filtrar por etiqueta</p>
-            <div className="flex flex-wrap gap-2">
-              {tags.map((t) => (
-                <button
-                  key={t.id}
-                  onClick={() => toggle(t.id)}
-                  className={
-                    sel.includes(t.id)
-                      ? "rounded-full bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground ring-1 ring-primary"
-                      : "rounded-full bg-background px-3 py-1.5 text-xs text-muted-foreground ring-1 ring-border transition-colors hover:text-foreground"
-                  }
-                >
-                  {t.name}
-                </button>
-              ))}
-            </div>
+        </section>
+      )}
+
+      {availTags.length > 0 && (
+        <section>
+          <div className="mb-3 flex items-center justify-between">
+            <p className="eyebrow">Etiquetas</p>
+            {tags.length > 0 && (
+              <button onClick={() => onSearch({ tags: [] })} className="text-xs text-primary">Limpiar filtros</button>
+            )}
           </div>
-        )}
-      </aside>
+          <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:flex-wrap sm:px-0">
+            {availTags.map((t) => (
+              <button
+                key={t.id}
+                onClick={() => toggle(t.slug)}
+                className={
+                  tags.includes(t.slug)
+                    ? "min-h-9 shrink-0 rounded-full bg-primary px-3.5 text-xs font-medium text-primary-foreground ring-1 ring-primary"
+                    : "min-h-9 shrink-0 rounded-full bg-background px-3.5 text-xs text-muted-foreground ring-1 ring-border transition-colors hover:text-foreground"
+                }
+              >
+                #{t.name.toLowerCase()}
+              </button>
+            ))}
+          </div>
+        </section>
+      )}
+
       <section>
-        <div className="mb-5 flex items-end justify-between">
-          <h1 className="font-display text-2xl font-medium leading-tight text-balance">{title}</h1>
-          <span className="text-sm text-muted-foreground">{shown.length} {shown.length === 1 ? "especie" : "especies"}</span>
+        <div className="mb-3 flex items-end justify-between">
+          <p className="eyebrow">Entradas</p>
+          <span className="text-sm text-muted-foreground">{shown.length} {shown.length === 1 ? "resultado" : "resultados"}</span>
         </div>
         {shown.length === 0 ? (
-          <p className="glass rounded-2xl p-8 text-sm text-muted-foreground">No hay especies que coincidan con la búsqueda.</p>
+          <p className="glass rounded-2xl p-8 text-sm text-muted-foreground">No hay entradas que coincidan con la búsqueda.</p>
         ) : (
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
-            {shown.map((p) => <PlantCard key={p.id} plant={p} tags={catalog.tags} />)}
+          <div className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-3">
+            {shown.map((p) => <ItemCard key={p.id} item={p} catalog={catalog} from={from} />)}
           </div>
         )}
       </section>
@@ -158,5 +210,5 @@ export function Browser({ title, folders, folderLabel, plants, catalog, activeFo
 }
 
 export function Loading() {
-  return <p className="py-20 text-center text-sm text-muted-foreground">Cargando herbario…</p>;
+  return <p className="py-20 text-center text-sm text-muted-foreground">Cargando catálogo…</p>;
 }
