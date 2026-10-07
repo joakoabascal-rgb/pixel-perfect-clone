@@ -11,6 +11,7 @@
 
 # Agents
 
-- Plants are stored once and linked to categories/tags via join tables (plant_categories, plant_tags); categories nest via parent_id. Why: a plant must appear in many folders without duplication.
-- Catalog writes are allowed only for users with the `admin` role in `user_roles` (RLS via `has_role`); everyone can read. Why: regular users must never modify the catalog.
-- Plant images are bundled assets keyed by `plants.image_key` (src/lib/catalog.ts). Why: seed images ship with the app.
+- Catalog is generic: `items` (with `item_types` and flexible `attributes` jsonb of {label,value}) linked to nested `categories` and `tags` via `item_categories`/`item_tags`; extra pictures in `item_images`. Why: one record per entry, any kind of entry, many folders without duplication.
+- Catalog is read-only for all app clients (public SELECT policies only, no write grants); content is managed directly in the backend. Why: no admin system in the app by user request.
+- Images are referenced by `image_key`: a bundled asset key or a full https URL (src/lib/catalog.ts). Why: user manages images themselves.
+- Visual style lives entirely in src/styles.css tokens (square corners, bevelled `glass` panel utility). Why: keep redesigns token-only.
