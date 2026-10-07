@@ -49,10 +49,10 @@ function ItemPage() {
   return (
     <Shell>
       <Breadcrumb path={crumbs} current={item.name} />
-      <section className="overflow-hidden rounded-[28px] bg-secondary/60 p-4 ring-1 ring-border backdrop-blur-xl sm:p-5">
+      <section className="overflow-hidden rounded-none bg-secondary border-b-2 border-primary/40 p-4 ring-2 ring-border  sm:p-5">
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-[420px_1fr]">
           <div>
-            <div className="aspect-square overflow-hidden rounded-2xl bg-background">
+            <div className="aspect-square overflow-hidden rounded-none bg-background">
               {main ? (
                 <img src={main} alt={item.name} width={896} height={752} className="size-full object-cover" />
               ) : (
@@ -65,7 +65,7 @@ function ItemPage() {
                   <button
                     key={k}
                     onClick={() => setActive(k)}
-                    className={`size-16 overflow-hidden rounded-xl ring-2 ${(active ?? allImages[0]) === k ? "ring-primary" : "ring-transparent"}`}
+                    className={`size-16 overflow-hidden rounded-none ring-2 ${(active ?? allImages[0]) === k ? "ring-primary" : "ring-transparent"}`}
                   >
                     <img src={imageSrc(k)} alt="" loading="lazy" className="size-full object-cover" />
                   </button>
@@ -75,7 +75,7 @@ function ItemPage() {
           </div>
           <div className="py-1">
             <p className="eyebrow text-accent">{type?.name ?? "Ficha"}</p>
-            <h1 className="mt-1 font-display text-4xl font-medium leading-tight text-balance">{item.name}</h1>
+            <h1 className="mt-1 font-display text-4xl font-semibold uppercase tracking-wide leading-tight text-balance">{item.name}</h1>
             {item.subtitle && (
               <p className="mt-1 font-display text-base italic text-muted-foreground">{item.subtitle}</p>
             )}
@@ -86,9 +86,9 @@ function ItemPage() {
             {item.attributes.length > 0 && (
               <div className="mt-6">
                 <p className="eyebrow mb-2">Información</p>
-                <dl className="grid gap-px overflow-hidden rounded-2xl bg-border ring-1 ring-border sm:grid-cols-2">
+                <dl className="grid gap-px overflow-hidden rounded-none bg-border ring-2 ring-border sm:grid-cols-2">
                   {item.attributes.map((a) => (
-                    <div key={a.label} className="bg-background/80 p-3">
+                    <div key={a.label} className="bg-secondary/90 p-3">
                       <dt className="text-[11px] uppercase tracking-[0.12em] text-muted-foreground">{a.label}</dt>
                       <dd className="mt-0.5 text-sm">{a.value}</dd>
                     </div>
@@ -105,7 +105,7 @@ function ItemPage() {
                     const path = categoryPath(c, data.categories);
                     return (
                       <li key={c.id} className="flex items-center gap-2">
-                        <span className="size-1.5 shrink-0 rounded-full bg-primary" />
+                        <span className="size-1.5 shrink-0 rounded-none bg-primary" />
                         <span className="flex flex-wrap gap-1">
                           {path.map((p, i) => (
                             <span key={p.id}>
