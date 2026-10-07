@@ -5,11 +5,11 @@ import { imageSrc, filterItems, type Catalog, type Category, type Item, type Tag
 export function Shell({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen text-foreground">
-      <header className="sticky top-0 z-30 border-b border-border bg-secondary/60 backdrop-blur-xl">
+      <header className="sticky top-0 z-30 border-b border-border bg-secondary border-b-2 border-primary/40 ">
         <div className="mx-auto flex max-w-6xl items-center gap-6 px-4 py-3 sm:px-6 sm:py-4">
           <Link to="/" className="flex items-center gap-2.5">
-            <span className="grid size-8 place-items-center rounded-full bg-primary/15 ring-1 ring-primary/20">
-              <span className="size-2.5 rounded-full bg-primary" />
+            <span className="grid size-8 place-items-center rounded-none bg-primary/15 ring-1 ring-primary/20">
+              <span className="size-2.5 rounded-none bg-primary" />
             </span>
             <span className="font-display text-lg font-medium tracking-tight">Herbario</span>
           </Link>
@@ -33,7 +33,7 @@ export function BackButton() {
   return (
     <button
       onClick={() => router.history.back()}
-      className="glass inline-flex min-h-10 items-center gap-1.5 rounded-full px-4 text-sm text-muted-foreground transition-colors hover:text-foreground"
+      className="glass inline-flex min-h-10 items-center gap-1.5 rounded-none px-4 text-sm text-muted-foreground transition-colors hover:text-foreground"
     >
       ← Volver
     </button>
@@ -74,8 +74,8 @@ export function TagChip({ tag, primary }: { tag: Tag; primary?: boolean }) {
       search={{ tags: [tag.slug] }}
       className={
         primary
-          ? "rounded-full bg-primary/12 px-2.5 py-1 text-[11px] font-medium text-primary hover:bg-primary/20"
-          : "rounded-full bg-background px-2.5 py-1 text-[11px] text-muted-foreground ring-1 ring-border hover:text-foreground"
+          ? "rounded-none bg-primary/12 px-2.5 py-1 text-[11px] font-medium text-primary hover:bg-primary/20"
+          : "rounded-none bg-background px-2.5 py-1 text-[11px] text-muted-foreground ring-2 ring-border hover:text-foreground"
       }
     >
       #{tag.name.toLowerCase()}
@@ -91,7 +91,7 @@ export function ItemCard({ item, catalog, from }: { item: Item; catalog: Catalog
       to="/item/$slug"
       params={{ slug: item.slug }}
       search={from ? { desde: from } : {}}
-      className="glass block overflow-hidden rounded-2xl transition-transform hover:-translate-y-0.5"
+      className="glass block overflow-hidden rounded-none transition-transform hover:-translate-y-0.5"
     >
       <div className="relative aspect-[4/3] bg-muted">
         {src ? (
@@ -100,7 +100,7 @@ export function ItemCard({ item, catalog, from }: { item: Item; catalog: Catalog
           <div className="grid size-full place-items-center font-display text-4xl text-sage">{item.name[0]}</div>
         )}
         {type && (
-          <span className="absolute left-3 top-3 rounded-full bg-background/80 px-2.5 py-1 text-[11px] font-medium text-foreground backdrop-blur">
+          <span className="absolute left-3 top-3 rounded-none bg-secondary/90 px-2.5 py-1 text-[11px] font-medium text-foreground ">
             {type.name}
           </span>
         )}
@@ -118,10 +118,10 @@ function CategoryCard({ cat, count }: { cat: Category; count: number }) {
     <Link
       to="/categoria/$slug"
       params={{ slug: cat.slug }}
-      className="glass flex min-h-20 flex-col justify-between rounded-2xl p-4 transition-transform hover:-translate-y-0.5"
+      className="glass flex min-h-20 flex-col justify-between rounded-none p-4 transition-transform hover:-translate-y-0.5"
     >
       <span className="flex items-start justify-between gap-2">
-        <span className="grid size-8 place-items-center rounded-lg bg-primary/12 text-primary">▢</span>
+        <span className="grid size-8 place-items-center rounded-none bg-primary/12 text-primary">◆</span>
         <span className="text-xs text-muted-foreground">{count}</span>
       </span>
       <span className="mt-3 font-display text-base font-medium">{cat.name}</span>
@@ -143,11 +143,11 @@ export function Browser({ title, description, folders, folderLabel, items, catal
   return (
     <div className="space-y-6 pb-6">
       <div>
-        <h1 className="font-display text-3xl font-medium leading-tight text-balance">{title}</h1>
+        <h1 className="font-display text-3xl font-semibold uppercase tracking-wide leading-tight text-balance">{title}</h1>
         {description && <p className="mt-1 text-sm text-muted-foreground">{description}</p>}
       </div>
 
-      <div className="glass flex items-center gap-2 rounded-2xl px-4">
+      <div className="glass flex items-center gap-2 rounded-none px-4">
         <span className="text-muted-foreground">⌕</span>
         <input
           value={q}
@@ -181,8 +181,8 @@ export function Browser({ title, description, folders, folderLabel, items, catal
                 onClick={() => toggle(t.slug)}
                 className={
                   tags.includes(t.slug)
-                    ? "min-h-9 shrink-0 rounded-full bg-primary px-3.5 text-xs font-medium text-primary-foreground ring-1 ring-primary"
-                    : "min-h-9 shrink-0 rounded-full bg-background px-3.5 text-xs text-muted-foreground ring-1 ring-border transition-colors hover:text-foreground"
+                    ? "min-h-9 shrink-0 rounded-none bg-primary px-3.5 text-xs font-medium text-primary-foreground ring-1 ring-primary"
+                    : "min-h-9 shrink-0 rounded-none bg-background px-3.5 text-xs text-muted-foreground ring-2 ring-border transition-colors hover:text-foreground"
                 }
               >
                 #{t.name.toLowerCase()}
@@ -198,7 +198,7 @@ export function Browser({ title, description, folders, folderLabel, items, catal
           <span className="text-sm text-muted-foreground">{shown.length} {shown.length === 1 ? "resultado" : "resultados"}</span>
         </div>
         {shown.length === 0 ? (
-          <p className="glass rounded-2xl p-8 text-sm text-muted-foreground">No hay entradas que coincidan con la búsqueda.</p>
+          <p className="glass rounded-none p-8 text-sm text-muted-foreground">No hay entradas que coincidan con la búsqueda.</p>
         ) : (
           <div className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-3">
             {shown.map((p) => <ItemCard key={p.id} item={p} catalog={catalog} from={from} />)}
