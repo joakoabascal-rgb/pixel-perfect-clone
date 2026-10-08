@@ -9,9 +9,9 @@ export const Route = createFileRoute("/categoria/$slug")({
   validateSearch: zodValidator(browseSearch),
   head: () => ({
     meta: [
-      { title: "Categoría — Herbario" },
+      { title: "Categoría — All Wiki" },
       { name: "description", content: "Explora las entradas de esta carpeta del catálogo." },
-      { property: "og:title", content: "Categoría — Herbario" },
+      { property: "og:title", content: "Categoría — All Wiki" },
       { property: "og:description", content: "Explora las entradas de esta carpeta del catálogo." },
     ],
   }),
