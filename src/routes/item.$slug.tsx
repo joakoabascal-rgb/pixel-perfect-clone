@@ -10,9 +10,9 @@ export const Route = createFileRoute("/item/$slug")({
   validateSearch: zodValidator(z.object({ desde: fallback(z.string(), "").default("") })),
   head: () => ({
     meta: [
-      { title: "Ficha — Herbario" },
+      { title: "Ficha — All Wiki" },
       { name: "description", content: "Ficha del catálogo con imágenes, categorías, etiquetas e información." },
-      { property: "og:title", content: "Ficha — Herbario" },
+      { property: "og:title", content: "Ficha — All Wiki" },
       { property: "og:description", content: "Ficha del catálogo con imágenes, categorías, etiquetas e información." },
     ],
   }),

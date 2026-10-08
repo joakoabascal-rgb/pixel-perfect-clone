@@ -9,9 +9,9 @@ export const Route = createFileRoute("/")({
   validateSearch: zodValidator(browseSearch),
   head: () => ({
     meta: [
-      { title: "Herbario — Catálogo universal" },
+      { title: "All Wiki — Catálogo universal" },
       { name: "description", content: "Enciclopedia curada: plantas, animales, alimentos y más. Navega por carpetas, busca y filtra por etiquetas." },
-      { property: "og:title", content: "Herbario — Catálogo universal" },
+      { property: "og:title", content: "All Wiki — Catálogo universal" },
       { property: "og:description", content: "Enciclopedia curada: plantas, animales, alimentos y más." },
     ],
   }),

@@ -11,7 +11,7 @@ export function Shell({ children }: { children: ReactNode }) {
             <span className="grid size-8 place-items-center rounded-none bg-primary/15 ring-1 ring-primary/20">
               <span className="size-2.5 rounded-none bg-primary" />
             </span>
-            <span className="font-display text-lg font-medium tracking-tight">Herbario</span>
+            <span className="font-display text-lg font-medium tracking-tight">All Wiki</span>
           </Link>
           <nav className="ml-auto flex items-center gap-6 text-sm text-muted-foreground">
             <Link to="/" className="transition-colors hover:text-foreground" activeProps={{ className: "text-foreground" }} activeOptions={{ exact: true }}>
@@ -22,7 +22,7 @@ export function Shell({ children }: { children: ReactNode }) {
       </header>
       <main className="mx-auto max-w-6xl px-4 sm:px-6">{children}</main>
       <footer className="mx-auto max-w-6xl px-4 py-10 text-sm text-muted-foreground sm:px-6">
-        <p className="max-w-[56ch] text-pretty">Herbario — catálogo universal con navegación por carpetas, etiquetas y fichas.</p>
+        <p className="max-w-[56ch] text-pretty">All Wiki — catálogo universal con navegación por carpetas, etiquetas y fichas.</p>
       </footer>
     </div>
   );
