@@ -81,7 +81,7 @@ function ItemList({ catalog, refresh, onEdit }: { catalog: Catalog; refresh: () 
     setBusy(item.id);
     const { error, count } = await supabase.from("items").delete({ count: "exact" }).eq("id", item.id);
     setBusy(null);
-    if (error || !count) return toast.error(`No se pudo eliminar: ${error?.message ?? "sin permiso"}`);
+    if (error || !count) return void toast.error(`No se pudo eliminar: ${error?.message ?? "sin permiso"}`);
     await refresh();
     toast.success("Entrada eliminada");
   }
@@ -140,7 +140,7 @@ function ItemEditor({ item, catalog, onDone, onCancel }: { item: Item | null; ca
     const existing = allTags.find((t) => ("slug" in t && t.slug === s) || t.name.toLowerCase() === n.toLowerCase());
     if (existing) { setTags((t) => (t.includes(existing.id) ? t : [...t, existing.id])); setNewTag(""); return; }
     const { data, error } = await supabase.from("tags").insert({ name: n, slug: s }).select("id,name").single();
-    if (error || !data) return toast.error(`No se pudo crear la etiqueta: ${error?.message}`);
+    if (error || !data) return void toast.error(`No se pudo crear la etiqueta: ${error?.message}`);
     setExtraTags((x) => [...x, data]);
     setTags((t) => [...t, data.id]);
     setNewTag("");
@@ -269,8 +269,8 @@ function Folders({ catalog, refresh }: { catalog: Catalog; refresh: () => Promis
     e.preventDefault();
     const name = newName.trim();
     const slug = slugify(name);
-    if (!name || !slug) return toast.error("El nombre es obligatorio");
-    if (all.some((c) => c.slug === slug)) return toast.error("Ya existe una carpeta con ese nombre");
+    if (!name || !slug) return void toast.error("El nombre es obligatorio");
+    if (all.some((c) => c.slug === slug)) return void toast.error("Ya existe una carpeta con ese nombre");
     if (await run(() => supabase.from("categories").insert({ name, slug, parent_id: newParent || null }, { count: "exact" }), "Carpeta creada")) setNewName("");
   }
 
@@ -281,14 +281,14 @@ function Folders({ catalog, refresh }: { catalog: Catalog; refresh: () => Promis
   }
 
   function move(c: Category, parent: string) {
-    if (parent && descendantIds(c.id, all).includes(parent)) return toast.error("No puedes mover una carpeta dentro de sí misma");
+    if (parent && descendantIds(c.id, all).includes(parent)) return void toast.error("No puedes mover una carpeta dentro de sí misma");
     run(() => supabase.from("categories").update({ parent_id: parent || null }, { count: "exact" }).eq("id", c.id), "Carpeta movida");
   }
 
   function remove(c: Category) {
-    if (all.some((x) => x.parent_id === c.id)) return toast.error("Primero mueve o elimina sus subcarpetas");
+    if (all.some((x) => x.parent_id === c.id)) return void toast.error("Primero mueve o elimina sus subcarpetas");
     const orphans = catalog.items.filter((i) => i.categoryIds.length === 1 && i.categoryIds[0] === c.id);
-    if (orphans.length) return toast.error(`Quedarían sin carpeta: ${orphans.map((i) => i.name).join(", ")}. Asígnalas a otra carpeta primero.`);
+    if (orphans.length) return void toast.error(`Quedarían sin carpeta: ${orphans.map((i) => i.name).join(", ")}. Asígnalas a otra carpeta primero.`);
     if (!confirmDelete(`la carpeta "${c.name}"`)) return;
     run(() => supabase.from("categories").delete({ count: "exact" }).eq("id", c.id), "Carpeta eliminada");
   }
