@@ -343,6 +343,16 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_save_item: {
+        Args: {
+          _category_ids: string[]
+          _id: string
+          _images: Json
+          _item: Json
+          _tag_ids: string[]
+        }
+        Returns: string
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
