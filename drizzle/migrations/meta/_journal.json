@@ -15,6 +15,13 @@
       "when": 1791291050332,
       "tag": "0001_generic_items",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1791898211325,
+      "tag": "0002_admin_edit_mode",
+      "breakpoints": true
     }
   ]
 }
