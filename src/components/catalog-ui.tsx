@@ -1,8 +1,10 @@
 import { Link, useRouter } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import { imageSrc, filterItems, type Catalog, type Category, type Item, type Tag } from "@/lib/catalog";
+import { useIsAdmin } from "@/lib/admin";
 
 export function Shell({ children }: { children: ReactNode }) {
+  const isAdmin = useIsAdmin();
   return (
     <div className="min-h-screen text-foreground">
       <header className="sticky top-0 z-30 border-b border-border bg-secondary border-b-2 border-primary/40 ">
@@ -17,6 +19,11 @@ export function Shell({ children }: { children: ReactNode }) {
             <Link to="/" className="transition-colors hover:text-foreground" activeProps={{ className: "text-foreground" }} activeOptions={{ exact: true }}>
               Catálogo
             </Link>
+            {isAdmin && (
+              <Link to="/admin" className="transition-colors hover:text-foreground" activeProps={{ className: "text-foreground" }}>
+                Editar
+              </Link>
+            )}
           </nav>
         </div>
       </header>
