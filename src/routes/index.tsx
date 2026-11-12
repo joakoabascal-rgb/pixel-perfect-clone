@@ -13,6 +13,8 @@ export const Route = createFileRoute("/")({
       { name: "description", content: "Enciclopedia curada: plantas, animales, alimentos y más. Navega por carpetas, busca y filtra por etiquetas." },
       { property: "og:title", content: "All Wiki — Catálogo universal" },
       { property: "og:description", content: "Enciclopedia curada: plantas, animales, alimentos y más." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: Index,

@@ -13,6 +13,8 @@ export const Route = createFileRoute("/categoria/$slug")({
       { name: "description", content: "Explora las entradas de esta carpeta del catálogo." },
       { property: "og:title", content: "Categoría — All Wiki" },
       { property: "og:description", content: "Explora las entradas de esta carpeta del catálogo." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: CategoryPage,
