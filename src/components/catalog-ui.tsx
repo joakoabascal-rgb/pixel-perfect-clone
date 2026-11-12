@@ -1,21 +1,40 @@
-import { Link, useRouter } from "@tanstack/react-router";
+import { Link, useRouter, useNavigate } from "@tanstack/react-router";
+import { useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
+import { LogIn, LogOut } from "lucide-react";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { useAccount } from "@/lib/auth-state";
+import { signOutAccount } from "@/lib/auth-actions";
 import type { ReactNode } from "react";
 import { imageSrc, filterItems, type Catalog, type Category, type Item, type Tag } from "@/lib/catalog";
 import { useIsAdmin } from "@/lib/admin";
 
 export function Shell({ children }: { children: ReactNode }) {
   const isAdmin = useIsAdmin();
+  const { user, ready } = useAccount();
+  const qc = useQueryClient();
+  const navigate = useNavigate();
+  const [leaving, setLeaving] = useState(false);
+  async function signOut() {
+    setLeaving(true);
+    try {
+      await signOutAccount(qc);
+      await navigate({ to: "/auth", replace: true });
+    } catch { toast.error("No se pudo cerrar la sesión. Inténtalo de nuevo."); }
+    finally { setLeaving(false); }
+  }
   return (
     <div className="min-h-screen text-foreground">
       <header className="sticky top-0 z-30 border-b border-border bg-secondary border-b-2 border-primary/40 ">
-        <div className="mx-auto flex max-w-6xl items-center gap-6 px-4 py-3 sm:px-6 sm:py-4">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-3 px-4 py-3 sm:gap-6 sm:px-6 sm:py-4">
           <Link to="/" className="flex items-center gap-2.5">
             <span className="grid size-8 place-items-center rounded-none bg-primary/15 ring-1 ring-primary/20">
               <span className="size-2.5 rounded-none bg-primary" />
             </span>
             <span className="font-display text-lg font-medium tracking-tight">All Wiki</span>
           </Link>
-          <nav className="ml-auto flex items-center gap-6 text-sm text-muted-foreground">
+          <nav className="ml-auto flex flex-wrap items-center gap-3 text-sm text-muted-foreground sm:gap-6">
             <Link to="/" className="transition-colors hover:text-foreground" activeProps={{ className: "text-foreground" }} activeOptions={{ exact: true }}>
               Catálogo
             </Link>
@@ -24,6 +43,13 @@ export function Shell({ children }: { children: ReactNode }) {
                 Editar
               </Link>
             )}
+            {ready && (user ? (
+              <Button variant="ghost" size="sm" disabled={leaving} onClick={signOut}>
+                <LogOut /> Cerrar sesión
+              </Button>
+            ) : (
+              <Button asChild variant="ghost" size="sm"><Link to="/auth"><LogIn /> Iniciar sesión</Link></Button>
+            ))}
           </nav>
         </div>
       </header>

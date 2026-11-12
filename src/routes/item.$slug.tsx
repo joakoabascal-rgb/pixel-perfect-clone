@@ -14,6 +14,8 @@ export const Route = createFileRoute("/item/$slug")({
       { name: "description", content: "Ficha del catálogo con imágenes, categorías, etiquetas e información." },
       { property: "og:title", content: "Ficha — All Wiki" },
       { property: "og:description", content: "Ficha del catálogo con imágenes, categorías, etiquetas e información." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: ItemPage,

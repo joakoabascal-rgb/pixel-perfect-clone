@@ -12,6 +12,7 @@
 # Agents
 
 - Catalog is generic: `items` (with `item_types` and flexible `attributes` jsonb of {label,value}) linked to nested `categories` and `tags` via `item_categories`/`item_tags`; extra pictures in `item_images`. Why: one record per entry, any kind of entry, many folders without duplication.
-- Catalog is public-read; writes are allowed only to users with the `admin` role in `user_roles` via RLS (`has_role`), edited at /admin (under `_authenticated`). Entry saves go through the `admin_save_item` SECURITY INVOKER function for atomicity. Public signup is disabled. Why: single private editor, enforced in the database, not the UI.
+- Catalog is public-read; writes are allowed only to users with the `admin` role in `user_roles` via RLS (`has_role`), edited at /admin (under `_authenticated`). Entry saves go through the `admin_save_item` SECURITY INVOKER function for atomicity. Visitor accounts never receive an admin role. Why: private editing is enforced in the database, not the UI.
+- Account state uses one root auth subscriber and a shared context; sign-out cancels and clears queries before clearing the session. Why: keep navigation current without exposing cached private data.
 - Images are referenced by `image_key`: a bundled asset key or a full https URL (src/lib/catalog.ts). Why: user manages images themselves.
 - Visual style lives entirely in src/styles.css tokens (square corners, bevelled `glass` panel utility). Why: keep redesigns token-only.
