@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Shell } from "@/components/catalog-ui";
 import { catalogQuery, categoryPath, descendantIds, imageSrc, type Attribute, type Catalog, type Category, type Item } from "@/lib/catalog";
 import { checkIsAdmin, slugify } from "@/lib/admin";
+import { signOutAccount } from "@/lib/auth-actions";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   ssr: false,
@@ -19,6 +20,8 @@ export const Route = createFileRoute("/_authenticated/admin")({
       { property: "og:title", content: "Edición privada — All Wiki" },
       { property: "og:description", content: "Herramientas privadas de edición del catálogo." },
       { name: "robots", content: "noindex" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: AdminPage,
@@ -40,9 +43,10 @@ function AdminPage() {
   const refresh = () => qc.invalidateQueries({ queryKey: catalogQuery.queryKey });
 
   async function signOut() {
-    await qc.cancelQueries();
-    await supabase.auth.signOut();
-    navigate({ to: "/", replace: true });
+    try {
+      await signOutAccount(qc);
+      await navigate({ to: "/auth", replace: true });
+    } catch { toast.error("No se pudo cerrar la sesión."); }
   }
 
   return (

@@ -8,7 +8,9 @@ import {
   Scripts,
   type ErrorComponentProps,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { AccountContext, type AccountState } from "@/lib/auth-state";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -118,12 +120,45 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const router = useRouter();
+  const [account, setAccount] = useState<AccountState>({ user: null, ready: false, isAdmin: false });
+  useEffect(() => {
+    let alive = true;
+    let revision = 0;
+    async function refresh() {
+      const current = ++revision;
+      const { data: { user } } = await supabase.auth.getUser();
+      let isAdmin = false;
+      if (user) {
+        const { data, error } = await supabase.rpc("has_role", { _user_id: user.id, _role: "admin" });
+        isAdmin = !error && data === true;
+      }
+      if (alive && current === revision) setAccount({ user, ready: true, isAdmin });
+    }
+    const { data } = supabase.auth.onAuthStateChange((event) => {
+      if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "USER_UPDATED") return;
+      if (event === "SIGNED_OUT") {
+        revision++;
+        setAccount({ user: null, ready: true, isAdmin: false });
+      }
+      setTimeout(() => {
+        if (!alive) return;
+        if (event !== "SIGNED_OUT") void refresh();
+        void router.invalidate();
+        if (event !== "SIGNED_OUT") void queryClient.invalidateQueries();
+      }, 0);
+    });
+    void refresh();
+    return () => { alive = false; data.subscription.unsubscribe(); };
+  }, [router, queryClient]);
 
   return (
     <QueryClientProvider client={queryClient}>
+      <AccountContext.Provider value={account}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
       <Toaster />
+      </AccountContext.Provider>
     </QueryClientProvider>
   );
 }
